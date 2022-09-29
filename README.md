@@ -6,6 +6,6 @@ Data Science lecture BMS 225A 2022
 Repository structure
 
 - `raw_data` = data from Bunis et al 2021
-- `doc`
-- `results`
-- `src`
+- `doc` = previously published manuscript, other documentation
+- `results` = plots and tables resulting from analysis
+- `src` = source code files
