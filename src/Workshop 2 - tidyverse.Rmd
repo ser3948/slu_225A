@@ -1,0 +1,91 @@
+---
+title: "Workshop 2 code - Tidyverse"
+author: "Serena Lu"
+output: html_notebook
+---
+
+command + option + i (insert chunk)
+```{r intro}
+5+5
+5+5
+list.files()
+path.expand('~')
+```
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+read.csv("") -> use tab, then use ../ to go one level up
+```{r tidyverse - read in weather data}
+library(tidyverse)
+read.csv("../raw_data/sf_weather.csv") -> sf_weather
+sf_weather
+head(sf_weather)
+
+unique(sf_weather$SNOW)
+
+sf_weather$DATE[sf_weather$SNOW == "0.8"]
+unique(sf_weather$DATE[sf_weather$SNOW == "0.8"])
+
+```
+
+%>% pipe the data (no need to type it again in the following function)
+```{r selecting one year of data}
+sf_weather %>%
+  select( c(DATE, TMAX, TMIN) ) %>%
+  separate(DATE, c("YEAR", "MONTH", "DATE"), sep = "-", remove = FALSE) %>%
+  filter(YEAR == "2021") -> sf_weather_2021
+```
+
+```{r alternative way if not using piping}
+select(sf_weather, c(DATE, TMAX, TMIN))
+```
+rm() :remove something from the environment
+```{r adding average data}
+max_temp_month_2021 <- sf_weather_2021 %>%
+  mutate("TAVG" = (TMAX + TMIN)/2) %>%
+  group_by(MONTH) %>%
+  summarise("MAX_MONTH_TEMP" = max(TAVG))
+
+rm(max_temp_month) #remove something from the environment
+```
+
+```{r plotting the 2021 data}
+plot(max_temp_month_2021)
+```
+
+
+
+```{r weather function}
+yearly_subsetter <- function(year) {
+sf_weather %>%
+  select( c(DATE, TMAX, TMIN) ) %>%
+  separate(DATE, c("YEAR", "MONTH", "DATE"), sep = "-", remove = FALSE) %>%
+  mutate("TAVG" = (TMAX + TMIN)/2) %>%
+  group_by(MONTH) %>%
+  summarise("MAX_MONTH_TEMP" = max(TAVG))
+}
+
+yearly_subsetter(2021)
+yearly_subsetter(1950)
+plot(yearly_subsetter(1950))
+```
+
+```{r for loop for many years}
+for (single_year in c("1930", "1931", "1932")) {
+  plot(yearly_subsetter(single_year), main = single_year)
+  
+}
+```
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
